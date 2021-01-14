@@ -6,14 +6,14 @@ $.ajaxPrefilter(function(settings, _, jqXHR) {
 
 //-------------- BEGIN VARIABLE/FUNCTION DECLARATIONS ---------------------
 
-var SERVER_URL = 'http://127.0.0.1:3000/';
+var SERVER_URL = 'http://127.0.0.1:3000';
 
 //This one calls the Parse server to grab data, and sends it to processData
 var getData = function() {
-  $.ajax(SERVER_URL + '?order=-createdAt', {
+  $.ajax(SERVER_URL + '/classes/messages', {
     contentType: 'application/json',
     success: function (data) {
-      processData(data); // eslint-disable-line no-use-before-define
+      displayData({ results: data }); // eslint-disable-line no-use-before-define
     },
     error: function(data) {
       $('#error').prepend(' oh no').append('!');
@@ -22,20 +22,20 @@ var getData = function() {
 };
 
 // Here we sort the server messages by 'Created at' and send them to displayData
-var processData = function(data) {
-  var sortedData = data.results.sort(function(a, b) {
-    var aDate = new Date(a.createdAt);
-    var bDate = new Date(b.createdAt);
-    if (aDate > bDate) {
-      return -1;
-    } else if (aDate === bDate) {
-      return 0;
-    } else {
-      return 1;
-    }
-  });
-  displayData({results: sortedData}, userSelected); // eslint-disable-line no-use-before-define
-};
+// var processData = function(data) {
+//   var sortedData = data.results.sort(function(a, b) {
+//     var aDate = new Date(a.createdAt);
+//     var bDate = new Date(b.createdAt);
+//     if (aDate > bDate) {
+//       return -1;
+//     } else if (aDate === bDate) {
+//       return 0;
+//     } else {
+//       return 1;
+//     }
+//   });
+//   displayData({results: sortedData}, userSelected); // eslint-disable-line no-use-before-define
+// };
 
 var checkNewData = function(data) {
   var compDate = newestDate; // eslint-disable-line no-use-before-define
@@ -58,12 +58,12 @@ var displayData = function(data, user) {
   var i = 0;
   while (resultCount < 10 && i < data.results.length) {
 
-    newestDate = new Date(data.results[0].createdAt);
+    newestDate = new Date(data.results[0].created_on);
 
     if (user === data.results[i].username || !user) {
-      var timestamp = moment(data.results[i].createdAt).format('h:mm:ss a');
+      var timestamp = moment(data.results[i].created_on).format('h:mm:ss a');
       var $result = $('<li></li>').attr('data-username', data.results[i].username);
-      var $message = $('<p></p>').text(data.results[i].text);
+      var $message = $('<p></p>').text(data.results[i].chat_message);
       var $userName = $('<a></a>').text(data.results[i].username).addClass('onlyUser');
       var $likeUser = $('<a></a>').addClass('addUser').text(': ');
       var $timeStamp = $('<span></span>').text(timestamp);
