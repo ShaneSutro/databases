@@ -11,7 +11,8 @@ CREATE TABLE chatroom (
 CREATE TABLE users (
   id int not null auto_increment,
   username varchar(150) not null,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY unique_username (username)
 );
 
 /* Create other tables and define schemas for them here! */
