@@ -5,7 +5,8 @@ USE chat;
 CREATE TABLE chatroom (
   id INT NOT NULL AUTO_INCREMENT,
   roomname VARCHAR(150) NOT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY unique_roomname (roomname)
 );
 
 CREATE TABLE users (

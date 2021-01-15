@@ -8,7 +8,13 @@ module.exports = {
           res.send(data);
         });
     }, // a function which handles a get request for all messages
-    post: function (req, res) {} // a function which handles posting a message to the database
+    post: function (req, res) {
+      models.messages.post(req.body)
+        .then(data => {
+          res.send(data);
+          console.log('data: ', data);
+        });
+    } // a function which handles posting a message to the database
   },
 
   users: {
