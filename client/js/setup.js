@@ -51,7 +51,7 @@ var userSelectedGroup = {};
 var newestDate = new Date();
 var userSelected;
 
-var displayData = function(data, user) {
+var displayData = function (data, user) {
   var $results = [];
   var resultCount = 0;
 
@@ -64,7 +64,7 @@ var displayData = function(data, user) {
       var timestamp = moment(data.results[i].created_on).format('h:mm:ss a');
       var $result = $('<li></li>').attr('data-username', data.results[i].username);
       var $message = $('<p></p>').text(data.results[i].chat_message);
-      var $userName = $('<a></a>').text(data.results[i].username).addClass('onlyUser');
+      var $userName = $('<a></a>').text(data.results[i].user.username).addClass('onlyUser');
       var $likeUser = $('<a></a>').addClass('addUser').text(': ');
       var $timeStamp = $('<span></span>').text(timestamp);
 
@@ -111,7 +111,8 @@ var postData = function(message, username) { //This is the function responsible 
     type: 'POST',
     data: JSON.stringify({
       username: username,
-      text: message
+      text: message,
+      roomname: 1
     }),
     success: function (data) {
       console.log('Success!', data);

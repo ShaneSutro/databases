@@ -77,40 +77,37 @@ describe('Persistent Node Chat Server', function() {
     // them up to you. */
 
     dbConnection.query(queryString, queryArgs, function(err) {
-      if (err) { throw err; }
-
       // Now query the Node chat server and see if it returns
       // the message we just inserted:
       request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
         var messageLog = JSON.parse(body);
         expect(messageLog[0].chat_message).to.equal('Men like you can never change!');
-        expect(messageLog[0].roomname).to.equal('main');
+        expect(messageLog[0].chatroom.roomname).to.equal('main');
         done();
       });
     });
   });
 
-  it('Should return username at specified id for username that already exists', (done) =>{
+  it('Should return username that already exists instead of creating a new one', (done) =>{
     var queryString = 'insert into users (username) values (\'Stratus\')';
     var queryArgs = [''];
 
-    dbConnection.query(queryString, queryArgs, (err, data) => {
-      if (err) { console.log(err); }
-
+    dbConnection.query(queryString, queryArgs, (data) => {
       request('http://127.0.0.1:3000/classes/users', (err, res, body) => {
+
         var usernameLog = JSON.parse(body);
         expect(usernameLog[2].username).to.equal('Stratus');
+        expect(usernameLog.filter(username => username.username === 'Stratus').length).to.equal(1);
         done();
       });
     });
   });
 
-  it('Should return username at specified id for username that doesn\'t exists', (done) =>{
+  it('Should return created new username if username doesn\'t already exist', (done) =>{
     var queryString = 'insert into users (username) values (\'Arcus\')';
     var queryArgs = [''];
 
-    dbConnection.query(queryString, queryArgs, (err, data) => {
-      if (err) { console.log(err); }
+    dbConnection.query(queryString, queryArgs, (data) => {
 
       request('http://127.0.0.1:3000/classes/users', (err, res, body) => {
         var usernameLog = JSON.parse(body);

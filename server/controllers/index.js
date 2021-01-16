@@ -3,12 +3,13 @@ var models = require('../models');
 module.exports = {
   messages: {
     get: function (req, res) {
-      data = models.messages.get()
+      models.messages.get()
         .then(data => {
           res.send(data);
         })
         .catch(err => {
           console.log('Failed getting message from server: ', err);
+          res.sendStatus(400);
         });
     }, // a function which handles a get request for all messages
     post: function (req, res) {
@@ -16,7 +17,6 @@ module.exports = {
       models.messages.post(req.body)
         .then(data => {
           res.send(data);
-          console.log('data: ', data);
         })
         .catch(err => {
           console.log('/classes/messages POST error: ', err);
