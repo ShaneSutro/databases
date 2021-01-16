@@ -15,11 +15,16 @@ describe('Persistent Node Chat Server', function() {
     });
     dbConnection.connect();
 
-    var tablename = 'chat_messages'; // TODO: fill this out
+    // var tablenames = ['users', 'chat_messages']; // TODO: fill this out
+    var tablenames = 'chat_messages';
 
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
-    dbConnection.query('truncate ' + tablename, done);
+    dbConnection.query('truncate chat_messages', done);
+    // tablenames.forEach(tablename => {
+    //   dbConnection.query('SET FOREIGN_KEY_CHECKS = 0;');
+    //   dbConnection.query('truncate ' + tablename);
+    // })
   });
 
   afterEach(function() {
@@ -39,8 +44,7 @@ describe('Persistent Node Chat Server', function() {
         uri: 'http://127.0.0.1:3000/classes/messages',
         json: {
           username: 'Valjean',
-          message: 'In mercy\'s name, three days is all I need.',
-          roomname: 'Hello'
+          text: 'In mercy\'s name, three days is all I need.'
         }
       }, function () {
         // Now if we look in the database, we should find the
@@ -48,7 +52,7 @@ describe('Persistent Node Chat Server', function() {
 
         // TODO: You might have to change this test to get all the data from
         // your message table, since this is schema-dependent.
-        var queryString = 'SELECT * FROM chat_messages';
+        var queryString = 'SELECT * FROM chat_messages;';
         var queryArgs = [];
 
         dbConnection.query(queryString, queryArgs, function(err, results) {
@@ -66,7 +70,7 @@ describe('Persistent Node Chat Server', function() {
 
   it('Should output all messages from the DB', function(done) {
     // Let's insert a message into the db
-    var queryString = 'INSERT INTO chat_messages (username, chat_message, chatroom_id) VALUES (\'nimbus\', \'Men like you can never change!\', 1)';
+    var queryString = 'INSERT INTO chat_messages (username_id, chat_message, chatroom_id) VALUES (1, \'Men like you can never change!\', 1);';
     var queryArgs = [''];
     // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
@@ -80,7 +84,37 @@ describe('Persistent Node Chat Server', function() {
       request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
         var messageLog = JSON.parse(body);
         expect(messageLog[0].chat_message).to.equal('Men like you can never change!');
-        expect(messageLog[0].chatroom_id).to.equal(1);
+        expect(messageLog[0].roomname).to.equal('main');
+        done();
+      });
+    });
+  });
+
+  it('Should return username at specified id for username that already exists', (done) =>{
+    var queryString = 'insert into users (username) values (\'Stratus\')';
+    var queryArgs = [''];
+
+    dbConnection.query(queryString, queryArgs, (err, data) => {
+      if (err) { console.log(err); }
+
+      request('http://127.0.0.1:3000/classes/users', (err, res, body) => {
+        var usernameLog = JSON.parse(body);
+        expect(usernameLog[2].username).to.equal('Stratus');
+        done();
+      });
+    });
+  });
+
+  it('Should return username at specified id for username that doesn\'t exists', (done) =>{
+    var queryString = 'insert into users (username) values (\'Arcus\')';
+    var queryArgs = [''];
+
+    dbConnection.query(queryString, queryArgs, (err, data) => {
+      if (err) { console.log(err); }
+
+      request('http://127.0.0.1:3000/classes/users', (err, res, body) => {
+        var usernameLog = JSON.parse(body);
+        expect(usernameLog[usernameLog.length - 1].username).to.equal('Arcus');
         done();
       });
     });
